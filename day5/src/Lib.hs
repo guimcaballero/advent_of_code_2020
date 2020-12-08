@@ -5,8 +5,8 @@ module Lib
 import Data.List
 
 
-somefunc :: io ()
-somefunc = part2
+someFunc :: IO ()
+someFunc = part2
 
 
 data BTree = Leaf Int | Branch BTree BTree
