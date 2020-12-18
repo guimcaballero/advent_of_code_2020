@@ -5,7 +5,7 @@ module Lib
 import Text.Parsec
 import Text.Parsec.Expr
 import Text.Parsec.Token
-import Text.Parsec.Language (haskellStyle)
+import Text.Parsec.Language (haskell)
 
 someFunc :: IO ()
 someFunc = part1 >> part2
@@ -16,16 +16,14 @@ someFunc = part1 >> part2
 
 expr table = buildExpressionParser table (term table)
         <?> "expression"
-
-lexer = makeTokenParser haskellStyle
-term table =  parens lexer (expr table)
-        <|> natural lexer
+term table =  parens haskell (expr table)
+        <|> natural haskell
         <?> "simple expression"
 
 tablePart1 = [[binary "+" (+) AssocLeft, binary "*" (*) AssocLeft]]
 tablePart2 = [[binary "+" (+) AssocLeft], [binary "*" (*) AssocLeft]]
 
-binary  name fun assoc = Infix (do{ reservedOp lexer name; return fun }) assoc
+binary  name fun assoc = Infix (do{ reservedOp haskell name; return fun }) assoc
 
 unwrap (Right x) = x
 unwrap _ = error "Unwrapping Left"
