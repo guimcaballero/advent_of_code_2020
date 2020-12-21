@@ -4,30 +4,29 @@ module Lib
 
 import Text.Regex.Posix
 
-someFunc = part2
+someFunc :: IO ()
+someFunc = do
+  raw <- map parseLine . lines <$> readFile "input.txt"
+  print $ length $ filter checkPolicy1 raw
+  print $ length $ filter checkPolicy2 raw
 
-parseLine :: String -> (Int, Int, Char, String)
-parseLine line = (read min, read max, head letter, password)
-  where [min, max, letter, password] = match
-        (_,_,_,match) = line =~ "([0-9]+)-([0-9]+) ([a-z]): ([a-z]+)" :: (String, String, String, [String])
+type Line = (Int, Int, Char, String)
+
+parseLine :: String -> Line
+parseLine line = (read mn, read mx, head letter, password)
+  where
+    (_, _, _, [mn, mx, letter, password]) =
+      line =~ "([0-9]+)-([0-9]+) ([a-z]): ([a-z]+)" :: ( String
+                                                       , String
+                                                       , String
+                                                       , [String])
 
 count :: Eq a => a -> [a] -> Int
-count x = length . filter (x==)
+count a = length . filter (a ==)
 
 checkPolicy1 :: (Int, Int, Char, String) -> Bool
-checkPolicy1 (min, max, letter, password) = min <= len && len <= max
+checkPolicy1 (mn, mx, letter, password) = mn <= len && len <= mx
   where len = count letter password
-
-part1 :: IO ()
-part1 = do
-  raw <- readFile "input.txt"
-
-  let vec = lines raw
-  let parsedVec = map parseLine vec
-
-  let filteredVec = filter checkPolicy1 parsedVec
-
-  print $ length filteredVec
 
 xor :: Bool -> Bool -> Bool
 xor True a = not a
@@ -37,14 +36,3 @@ checkPolicy2 :: (Int, Int, Char, String) -> Bool
 checkPolicy2 (low, high, letter, password) = xor a b
   where a = (password !! (low - 1)) == letter
         b = (password !! (high - 1)) == letter
-
-part2 :: IO ()
-part2 = do
-  raw <- readFile "input.txt"
-
-  let vec = lines raw
-  let parsedVec = map parseLine vec
-
-  let filteredVec = filter checkPolicy2 parsedVec
-
-  print $ length filteredVec

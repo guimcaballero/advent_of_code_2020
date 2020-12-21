@@ -2,7 +2,11 @@ module Lib
     ( someFunc
     ) where
 
-someFunc = part2
+someFunc :: IO ()
+someFunc = do
+  trees <- lines <$> readFile "input.txt"
+  part1 trees
+  part2 trees
 
 checkIfPositionIsTree :: [String] -> (Int, Int) -> Bool
 checkIfPositionIsTree trees (row, column) = '#' == (trees !! row) !! column
@@ -19,20 +23,9 @@ countTreesInSlope trees (x, y) = length treePositions
       treePositions = filter (checkIfPositionIsTree trees) positions
 
 
-part1 :: IO ()
-part1 = do
-  raw <- readFile "input.txt"
-
-  let trees = lines raw
+part1, part2 :: [String] -> IO ()
+part1 trees = do
   print $ countTreesInSlope trees (1, 3)
-
-part2 :: IO ()
-part2 = do
-  raw <- readFile "input.txt"
-
-  let trees = lines raw
-
+part2 trees = do
   let slopes = [(1, 1),(1, 3),(1, 5),(1, 7),(2, 1)]
-  let counts = map (countTreesInSlope trees) slopes
-
-  print $ product counts
+  print $ product $ map (countTreesInSlope trees) slopes
