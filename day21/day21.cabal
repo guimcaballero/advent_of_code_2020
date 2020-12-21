@@ -1,0 +1,65 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: cd2081ad68a18e64ccba96a01d72c233e35c1f09a87778ca6c189adccf491e13
+
+name:           day21
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/day21#readme>
+homepage:       https://github.com/githubuser/day21#readme
+bug-reports:    https://github.com/githubuser/day21/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2020 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/day21
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_day21
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , parsec >= 3.1.14.0
+    , containers >= 0.6.2.1
+    , extra >= 1.7.8
+  default-language: Haskell2010
+
+executable day21-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_day21
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , day21
+  default-language: Haskell2010
+
+test-suite day21-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_day21
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , day21
+  default-language: Haskell2010
