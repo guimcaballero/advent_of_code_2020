@@ -1,3 +1,5 @@
+{-# Language DeriveFunctor #-}
+
 module Lib
     ( someFunc
     ) where
@@ -6,27 +8,27 @@ import Data.List
 import Data.List.Extra (groupOn, splitOn)
 
 someFunc :: IO ()
-someFunc = part2
-
-playUntilEnd :: [Int] -> [Int] -> ([Int], [Int])
-playUntilEnd deck1 [] = (deck1, [])
-playUntilEnd [] deck2 = (deck2, [])
-playUntilEnd (a:as) (b:bs) = playUntilEnd newA newB
-  where
-    (newA, newB) = if a > b then (as ++ [a, b], bs) else (as, bs ++ [b, a])
-
-deckScore = sum . zipWith (*) [1..] . reverse
-
-part1 :: IO ()
-part1 = do
-  [deck1, deck2] <- map (map read . tail) . splitOn [""] . lines <$> readFile "input2.txt"
-  let end = fst $ playUntilEnd deck1 deck2
-  print $ deckScore end
-
+someFunc = do
+  [deck1, deck2] <- map (map read . tail) . splitOn [""] . lines <$> readFile "input.txt"
+  print $ part1 deck1 deck2
+  print $ part2 deck1 deck2
 
 type Tracker = [([Int], [Int])]
 data Player a = One a | Two a
-  deriving (Show, Eq)
+  deriving (Show, Eq, Functor)
+
+deckScore :: [Int] -> Int
+deckScore = sum . zipWith (*) [1..] . reverse
+
+playUntilEnd :: [Int] -> [Int] -> Player [Int]
+playUntilEnd deck [] = One deck
+playUntilEnd [] deck = Two deck
+playUntilEnd (a:as) (b:bs)
+  | a > b = playUntilEnd (as ++ [a,b]) bs
+  | otherwise = playUntilEnd as (bs ++ [b, a])
+
+part1 :: [Int] -> [Int] -> Player Int
+part1 = ((deckScore <$>) .) . playUntilEnd
 
 playRecursive :: [Int] -> [Int] -> Tracker -> Player [Int]
 playRecursive [] deck _ = Two deck
@@ -36,17 +38,10 @@ playRecursive (a:as) (b:bs) tracker
   | a <= length as && b <= length bs = case playRecursive (take a as) (take b bs) [] of
                                       One _ -> playRecursive (as ++ [a, b]) bs newTracker
                                       Two _ -> playRecursive as (bs ++ [b, a]) newTracker
-  | otherwise = playRecursive newA newB newTracker
+  | a > b = playRecursive (as ++ [a,b]) bs newTracker
+  | otherwise = playRecursive as (bs ++ [b, a]) newTracker
   where
-    (newA, newB) = if a > b then (as ++ [a, b], bs) else (as, bs ++ [b, a])
     newTracker = (a:as, b:bs):tracker
 
-playGame :: [Int] -> [Int] -> Int
-playGame deck1 deck2 = case playRecursive deck1 deck2 [] of
-                         One deck -> deckScore deck
-                         Two deck -> deckScore deck
-
-part2 :: IO ()
-part2 = do
-  [deck1, deck2] <- map (map read . tail) . splitOn [""] . lines <$> readFile "input.txt"
-  print $ playGame deck1 deck2
+part2 :: [Int] -> [Int] -> Player Int
+part2 deck1 deck2 = deckScore <$> playRecursive deck1 deck2 []
